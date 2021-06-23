@@ -12,7 +12,5 @@
 	},
 	"MESSAGES": {
 		"HEALTHCHECK": "OK"
-	},
-	"Cast to string failed for value \"{ field": " 'title' }\" at path \"title\" for model \"TodoItem\"",
-	"Cast to ObjectId failed for value \"2114071\" at path \"_id\" for model \"TodoItem\"": "Cast to ObjectId failed for value \"2114071\" at path \"_id\" for model \"TodoItem\""
+	}
 }
