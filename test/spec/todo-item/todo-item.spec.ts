@@ -90,4 +90,13 @@ describe('POST /todos', () => {
         .to.equal('The title is empty or the title is not a string.')
     }
   })
+
+  describe('GET /todos', () => {
+    it('we should have got all the todo items', async () => {
+      const res = await chai.request(expressApp).get('/todos')
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.be.an('array')
+    })
+  })
 })
