@@ -1,4 +1,3 @@
-import account from './account'
 import config from 'config'
 import {
   connect,
@@ -8,7 +7,7 @@ import {
   Mongoose,
   Types,
 } from 'mongoose'
-import { Account, BaseModel, ModelFactory, TodoItem } from '@models'
+import { BaseModel, ModelFactory, TodoItem } from '@models'
 import { IDataStore, QueryOptions, DeleteResult } from '@storage'
 import { LooseObject } from '@typings'
 import todoItem from './todo-item'

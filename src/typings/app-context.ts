@@ -3,6 +3,5 @@ import { Logger } from '@typings'
 
 export type AppContext = {
   logger: Logger
-  accountRepository: Repositories.AccountRepository
   todoItemRepository: Repositories.TodoItemRepository
 }

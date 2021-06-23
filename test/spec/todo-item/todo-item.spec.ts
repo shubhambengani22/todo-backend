@@ -9,6 +9,7 @@ import { respositoryContext, testAppContext } from '../../mocks/app-context'
 
 import { App } from '../../../src/server'
 import { TodoItem } from '../../../src/models'
+import lodash from 'lodash'
 
 chai.use(chaiHttp)
 const expect = chai.expect
@@ -24,7 +25,7 @@ before(async () => {
 })
 
 describe('POST /todos', () => {
-  it('should create a new todoitem', async () => {
+  it('should create a new todo item', async () => {
     const res = await chai.request(expressApp).post('/todos').send({
       title: 'First Title',
     })
@@ -39,7 +40,17 @@ describe('POST /todos', () => {
       title: '',
     })
 
-    expect(res).to.have.status(400)
+    const checkIfRecordInserted =
+      await testAppContext.todoItemRepository.findOne({
+        title: '',
+      })
+
+    if (lodash.isEmpty(checkIfRecordInserted)) {
+      expect(res).to.have.status(400)
+      expect(res.body)
+        .to.have.nested.property('failures[0].message')
+        .to.equal('The title is empty or the title is not a string.')
+    }
   })
 
   it('should return a validation error if title is not string', async () => {
@@ -51,6 +62,9 @@ describe('POST /todos', () => {
       })
 
     expect(res).to.have.status(400)
+    expect(res.body)
+      .to.have.nested.property('failures[0].message')
+      .to.equal('The title is empty or the title is not a string.')
   })
 
   it('should return a validation error if title is already present in the Database', async () => {
@@ -63,6 +77,17 @@ describe('POST /todos', () => {
     const res = await chai.request(expressApp).post('/todos').send({
       title: 'First Title',
     })
-    expect(res).to.have.status(400)
+
+    const checkIfRecordInserted =
+      await testAppContext.todoItemRepository.findOne({
+        title: 'First Title',
+      })
+
+    if (lodash.isEmpty(checkIfRecordInserted)) {
+      expect(res).to.have.status(400)
+      expect(res.body)
+        .to.have.nested.property('failures[0].message')
+        .to.equal('The title is empty or the title is not a string.')
+    }
   })
 })

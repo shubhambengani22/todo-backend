@@ -9,7 +9,7 @@
     "lint": "tslint --fix -c tslint.json src/**/*.ts test/**/*.ts",
     "heroku-postbuild": "npm run build",
     "heroku-start": "node ./dist/server/server",
-    "test": "NODE_ENV=testing mocha --exit -r ts-node/register --project tsconfig.json test/spec/todo-item/todo-item.spec.ts",
+    "test": "NODE_ENV=testing mocha --exit -r ts-node/register --project tsconfig.json test/**/*.spec.ts",
     "serve": "gulp serve"
   },
   "author": "",

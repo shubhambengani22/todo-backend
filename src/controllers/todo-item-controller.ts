@@ -43,7 +43,6 @@ export class TodoItemController extends BaseController {
     }
 
     const { title } = req.body
-    console.log(title)
     const todoItem = await this.appContext.todoItemRepository.save(
       new TodoItem({ title })
     )
