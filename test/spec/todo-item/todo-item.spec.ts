@@ -25,7 +25,7 @@ before(async () => {
 })
 
 describe('POST /todos', () => {
-  it('should create a new todoitem', async () => {
+  it('should create a new todo item', async () => {
     const res = await chai.request(expressApp).post('/todos').send({
       title: 'First Title',
     })
@@ -47,11 +47,9 @@ describe('POST /todos', () => {
 
     if (lodash.isEmpty(checkIfRecordInserted)) {
       expect(res).to.have.status(400)
-      expect(res.body).to.have.property('message')
-      expect(res.body).to.have.property('failures')
-      expect(res.body.failures[0].message).to.equal(
-        'The title is empty or the title is not a string.'
-      )
+      expect(res.body)
+        .to.have.nested.property('failures[0].message')
+        .to.equal('The title is empty or the title is not a string.')
     }
   })
 
@@ -89,44 +87,7 @@ describe('POST /todos', () => {
       expect(res).to.have.status(400)
       expect(res.body)
         .to.have.nested.property('failures[0].message')
-        .to.equal(
-          'The title name is already taken. Please enter a different one.'
-        )
+        .to.equal('The title is empty or the title is not a string.')
     }
-  })
-
-  describe('DELETE /todos/:id', () => {
-    it('should delete a todo item if it exists and if ID is valid MongoDB ID', async () => {
-      const todoItem = await testAppContext.todoItemRepository.save(
-        new TodoItem({ title: 'Title to be deleted' })
-      )
-      const res = await chai
-        .request(expressApp)
-        .delete(`/todos/${todoItem._id}`)
-
-      expect(res).to.have.status(204)
-    })
-
-    it('should return a validation error if todo item does not exists and if id is a mongo id', async () => {
-      const res = await chai
-        .request(expressApp)
-        .delete('/todos/60d2fe74bd99a211407165e9')
-
-      expect(res).to.have.status(400)
-      expect(res.body)
-        .to.have.nested.property('failures[0].message')
-        .to.equal(
-          'The item with the specified ID could not be found. Please enter a valid ID.'
-        )
-    })
-
-    it('should return a validation error if id is not a mongo id', async () => {
-      const res = await chai.request(expressApp).delete('/todos/2114071')
-
-      expect(res).to.have.status(400)
-      expect(res.body)
-        .to.have.nested.property('failures[0].message')
-        .to.equal('The specified ID is not a MongoDB ID.')
-    })
   })
 })
