@@ -7,17 +7,17 @@
     "moduleResolution": "node",
     "inlineSourceMap": true,
     "outDir": "dist",
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      "@controllers": ["src/controllers/index"],
-      "@helpers": ["src/helpers/index"],
-      "@models": ["src/models/index"],
-      "@middleware": ["src/middleware/index"],
-      "@server": ["src/server/index"],
-      "@services": ["src/services/index"],
-      "@storage": ["src/storage/index"],
-      "@typings": ["src/typings/index"],
-      "@validators": ["src/validators/index"]
+      "@controllers": ["controllers/index"],
+      "@helpers": ["helpers/index"],
+      "@models": ["models/index"],
+      "@middleware": ["middleware/index"],
+      "@server": ["server/index"],
+      "@services": ["services/index"],
+      "@storage": ["storage/index"],
+      "@typings": ["typings/index"],
+      "@validators": ["validators/index"]
     }
   },
   "include": ["./src/**/*.ts"]

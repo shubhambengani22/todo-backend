@@ -25,7 +25,7 @@ before(async () => {
 })
 
 describe('POST /todos', () => {
-  it('should create a new todoitem', async () => {
+  it('should create a new todo item', async () => {
     const res = await chai.request(expressApp).post('/todos').send({
       title: 'First Title',
     })
@@ -47,11 +47,9 @@ describe('POST /todos', () => {
 
     if (lodash.isEmpty(checkIfRecordInserted)) {
       expect(res).to.have.status(400)
-      expect(res.body).to.have.property('message')
-      expect(res.body).to.have.property('failures')
-      expect(res.body.failures[0].message).to.equal(
-        'The title is empty or the title is not a string.'
-      )
+      expect(res.body)
+        .to.have.nested.property('failures[0].message')
+        .to.equal('The title is empty or the title is not a string.')
     }
   })
 

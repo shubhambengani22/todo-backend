@@ -8,6 +8,7 @@ import {
   ExtendedRequest,
   ValidationFailure,
 } from '@typings'
+
 import { createTodoItemValidator, deleteTodoItemValidator } from '@validators'
 
 export class TodoItemController extends BaseController {
