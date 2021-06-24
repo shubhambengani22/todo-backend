@@ -71,9 +71,6 @@ export class TodoItemController extends BaseController {
       await this.appContext.todoItemRepository.getAll({})
     )
 
-    // var id = todoItems.todoItems[0].serialize().id
-    // console.log(mongoose.Types.ObjectId(id).getTimestamp())
-
     res.status(200).json(todoItems.serialize())
   }
 }
