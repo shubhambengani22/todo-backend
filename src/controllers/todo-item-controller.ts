@@ -9,6 +9,7 @@ import {
   ValidationFailure,
 } from '@typings'
 import { createTodoItemValidator } from '@validators'
+import mongoose from 'mongoose'
 
 export class TodoItemController extends BaseController {
   public basePath: string = '/todos'
@@ -69,6 +70,9 @@ export class TodoItemController extends BaseController {
     const todoItems = new TodoItems(
       await this.appContext.todoItemRepository.getAll({})
     )
+
+    // var id = todoItems.todoItems[0].serialize().id
+    // console.log(mongoose.Types.ObjectId(id).getTimestamp())
 
     res.status(200).json(todoItems.serialize())
   }
