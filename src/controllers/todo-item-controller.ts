@@ -9,7 +9,6 @@ import {
   ValidationFailure,
 } from '@typings'
 import { createTodoItemValidator } from '@validators'
-import mongoose from 'mongoose'
 
 export class TodoItemController extends BaseController {
   public basePath: string = '/todos'
