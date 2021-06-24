@@ -94,11 +94,11 @@ describe('POST /todos', () => {
 
 describe('GET /todos/:id', () => {
   it('should fetch a todo item if it exists and if id is valid mongo id', async () => {
-    const todoitem = await testAppContext.todoItemRepository.save(
+    const todoItem = await testAppContext.todoItemRepository.save(
       new TodoItem({ title: 'Fetching an item' })
     )
 
-    const res = await chai.request(expressApp).get(`/todos/${todoitem._id}`)
+    const res = await chai.request(expressApp).get(`/todos/${todoItem._id}`)
 
     expect(res).to.have.status(200)
     expect(res.body).to.have.property('id')
@@ -120,5 +120,15 @@ describe('GET /todos/:id', () => {
       .get('/todos/605bb3efc93d78b7f4388c2c')
 
     expect(res).to.have.status(404)
+  })
+
+  it('the id mentioned in the request should be equal to the id of the todo in the database', async () => {
+    const todoItem = await testAppContext.todoItemRepository.save(
+      new TodoItem({ title: 'Check ID' })
+    )
+    const res = await chai.request(expressApp).get(`/todos/${todoItem._id}`)
+
+    expect(res).to.have.status(200)
+    expect(res.body.id).to.deep.equal(todoItem._id.toString())
   })
 })
