@@ -8,7 +8,8 @@ import {
   ExtendedRequest,
   ValidationFailure,
 } from '@typings'
-import { createTodoItemValidator, updateTodoItemValidator } from '@validators'
+
+import { createTodoItemValidator, deleteTodoItemValidator } from '@validators'
 
 export class TodoItemController extends BaseController {
   public basePath: string = '/todos'
@@ -26,10 +27,10 @@ export class TodoItemController extends BaseController {
       this.createTodoItem
     )
 
-    this.router.put(
+    this.router.delete(
       `${this.basePath}/:id`,
-      updateTodoItemValidator(this.appContext),
-      this.updateTodoItem
+      deleteTodoItemValidator(this.appContext),
+      this.deleteTodoItem
     )
   }
 
@@ -55,7 +56,7 @@ export class TodoItemController extends BaseController {
     res.status(201).json(todoItem.serialize())
   }
 
-  private updateTodoItem = async (
+  private deleteTodoItem = async (
     req: ExtendedRequest,
     res: Response,
     next: NextFunction
@@ -71,19 +72,9 @@ export class TodoItemController extends BaseController {
     }
 
     const { id } = req.params
-    const { title } = req.body
-    const todoItem = await this.appContext.todoItemRepository.update(
-      { _id: id },
-      { $set: { title } }
-    )
-
-    if (todoItem._id) {
-      res.status(200).json(todoItem.serialize())
-    } else {
-      const valError = new Errors.NotFoundError(
-        res.__('DEFAULT_ERRORS.VALIDATION_FAILED')
-      )
-      next(valError)
-    }
+    const deleteItem = await this.appContext.todoItemRepository.deleteMany({
+      _id: id,
+    })
+    res.status(204).json(deleteItem)
   }
 }

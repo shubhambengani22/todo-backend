@@ -7,7 +7,7 @@
   "VALIDATION_ERRORS": {
     "INVALID_TITLE": "The title is empty or the title is not a string.",
     "DUPLICATE_TITLE": "The title name is already taken. Please provide a different one.",
-    "INVALID_ID": "The specified ID is not a MongoDB ID.",
+    "INVALID_ID": "The specified todo ID is not a valid one. Please provide a valid one.",
     "ID_NOT_FOUND": "The item with the specified ID could not be found. Please enter a valid ID."
   },
   "MESSAGES": {
