@@ -9,6 +9,7 @@ import { respositoryContext, testAppContext } from "../../mocks/app-context";
 
 import { App } from "../../../src/server";
 import { TodoItem } from "../../../src/models";
+import { todoItems } from "../../../src/storage/mongoose";
 import lodash from "lodash";
 
 chai.use(chaiHttp);
@@ -125,6 +126,77 @@ describe("POST /todos", () => {
         .to.equal(
           "The specified todo ID is not a valid one. Please provide a valid one."
         );
+    });
+  });
+
+  describe("PUT /todos/:id", () => {
+    it("should update a todo item if it exists, if id is valid mongo id and if title is valid non-empty string", async () => {
+      const todoItem = await testAppContext.todoItemRepository.save(
+        new TodoItem({ title: "Update TODO" })
+      );
+
+      const updatedItem = "Item Updated";
+
+      const res = await chai
+        .request(expressApp)
+        .put(`/todos/${todoItem._id}`)
+        .send({
+          title: updatedItem,
+        });
+
+      todoItems.find({ title: updatedItem }, function (err, data) {
+        expect(new TodoItem(data[0]).serialize().title).to.deep.equal(
+          updatedItem
+        );
+      });
+
+      expect(res).to.have.status(200);
+      expect(res.body).to.have.property("id");
+      expect(res.body).to.have.property("title");
+      expect(res.body.id).to.deep.equal(todoItem._id.toString());
+      expect(res.body.title).to.deep.equal(updatedItem);
+    });
+
+    it("should return a validation error if empty title is specified", async () => {
+      const todoitem = await testAppContext.todoItemRepository.save(
+        new TodoItem({ title: "TODO_TO_BE_UPDATED" })
+      );
+
+      const res = await chai
+        .request(expressApp)
+        .put(`/todos/${todoitem._id}`)
+        .send({
+          title: "",
+        });
+
+      expect(res).to.have.status(400);
+      expect(res.body)
+        .to.have.nested.property("failures[0].message")
+        .to.equal("The title is empty or the title is not a string.");
+    });
+
+    it("should return a validation error if id is invalid mongo id", async () => {
+      const res = await chai.request(expressApp).put("/todos/hhd8882nn").send({
+        title: "Update TODO",
+      });
+
+      expect(res).to.have.status(400);
+      expect(res.body)
+        .to.have.nested.property("failures[0].message")
+        .to.equal(
+          "The item with the specified ID could not be found. Please enter a valid ID."
+        );
+    });
+
+    it("should return a 404 if todo item does not exists", async () => {
+      const res = await chai
+        .request(expressApp)
+        .put("/todos/605bb3efc93d78b7f4335c2c")
+        .send({
+          title: "TODO_UPDATED",
+        });
+
+      expect(res).to.have.status(404);
     });
   });
 });
