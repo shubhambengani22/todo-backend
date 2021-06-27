@@ -1,17 +1,16 @@
 {
-	"DEFAULT_ERRORS": {
-		"INTERNAL_SERVER_ERROR": "Internal server error. Please try again later.",
-		"RESOURCE_NOT_FOUND": "Requested resource not found.",
-		"VALIDATION_FAILED": "Validation failed. Please modify the request and try again."
-	},
-	"VALIDATION_ERRORS": {
-		"INVALID_TITLE": "The title is empty or the title is not a string.",
-		"DUPLICATE_TITLE": "The title name is already taken. Please provide a different one.",
-		"INVALID_ID": "The specified ID is not a MongoDB ID.",
-		"ID_NOT_FOUND": "The item with the specified ID could not be found. Please enter a valid ID."
-	},
-	"MESSAGES": {
-		"HEALTHCHECK": "OK"
-	},
-	"Cast to string failed for value \"{ field": " 'title' }\" at path \"title\" for model \"TodoItem\""
+  "DEFAULT_ERRORS": {
+    "INTERNAL_SERVER_ERROR": "Internal server error. Please try again later.",
+    "RESOURCE_NOT_FOUND": "Requested resource not found.",
+    "VALIDATION_FAILED": "Validation failed. Please modify the request and try again."
+  },
+  "VALIDATION_ERRORS": {
+    "INVALID_TITLE": "The title is empty or the title is not a string.",
+    "DUPLICATE_TITLE": "The title name is already taken. Please provide a different one.",
+    "INVALID_ID": "The specified todo ID is not a valid one. Please provide a valid one.",
+    "ID_NOT_FOUND": "The item with the specified ID could not be found. Please enter a valid ID."
+  },
+  "MESSAGES": {
+    "HEALTHCHECK": "OK"
+  }
 }
