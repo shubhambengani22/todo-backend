@@ -91,112 +91,151 @@ describe("POST /todos", () => {
         .to.equal("The title is empty or the title is not a string.");
     }
   });
+});
 
-  describe("DELETE /todos/:id", () => {
-    it("should delete a todo item if it exists and if ID it is valid.", async () => {
-      const todoItem = await testAppContext.todoItemRepository.save(
-        new TodoItem({ title: "Title to be deleted" })
-      );
-      const res = await chai
-        .request(expressApp)
-        .delete(`/todos/${todoItem._id}`);
+describe("GET /todos/:id", () => {
+  it("should fetch a todo item if it exists and if id is valid mongo id", async () => {
+    const todoItem = await testAppContext.todoItemRepository.save(
+      new TodoItem({ title: "Fetching an item" })
+    );
 
-      expect(res).to.have.status(204);
-    });
+    const res = await chai.request(expressApp).get(`/todos/${todoItem._id}`);
 
-    it("should return a validation error if todo item does not exists and if id is a valid.", async () => {
-      const res = await chai
-        .request(expressApp)
-        .delete("/todos/60d2fe74bd99a211407165e9");
-
-      expect(res).to.have.status(400);
-      expect(res.body)
-        .to.have.nested.property("failures[0].message")
-        .to.equal(
-          "The item with the specified ID could not be found. Please enter a valid ID."
-        );
-    });
-
-    it("should return a validation error if id is not a valid ID.", async () => {
-      const res = await chai.request(expressApp).delete("/todos/2114071");
-
-      expect(res).to.have.status(400);
-      expect(res.body)
-        .to.have.nested.property("failures[0].message")
-        .to.equal(
-          "The specified todo ID is not a valid one. Please provide a valid one."
-        );
-    });
+    expect(res).to.have.status(200);
+    expect(res.body).to.have.property("id");
+    expect(res.body).to.have.property("title");
   });
 
-  describe("PUT /todos/:id", () => {
-    it("should update a todo item if it exists, if id is valid mongo id and if title is valid non-empty string", async () => {
-      const todoItem = await testAppContext.todoItemRepository.save(
-        new TodoItem({ title: "Update TODO" })
+  it("Should return a validation error if id is invalid mongo id", async () => {
+    const res = await chai.request(expressApp).get("/todos/jlkm129e2nk");
+
+    expect(res).to.have.status(400);
+    expect(res.body)
+      .to.have.nested.property("failures[0].message")
+      .to.equal("The specified ID is not a MongoDB ID.");
+  });
+
+  it("should return a 404 if todo item does not exists", async () => {
+    const res = await chai
+      .request(expressApp)
+      .get("/todos/605bb3efc93d78b7f4388c2c");
+
+    expect(res).to.have.status(404);
+  });
+
+  it("the id mentioned in the request should be equal to the id of the todo in the database", async () => {
+    const todoItem = await testAppContext.todoItemRepository.save(
+      new TodoItem({ title: "Check ID" })
+    );
+    const res = await chai.request(expressApp).get(`/todos/${todoItem._id}`);
+
+    expect(res).to.have.status(200);
+    expect(res.body.id).to.deep.equal(todoItem._id.toString());
+  });
+});
+
+describe("DELETE /todos/:id", () => {
+  it("should delete a todo item if it exists and if ID it is valid.", async () => {
+    const todoItem = await testAppContext.todoItemRepository.save(
+      new TodoItem({ title: "Title to be deleted" })
+    );
+    const res = await chai.request(expressApp).delete(`/todos/${todoItem._id}`);
+
+    expect(res).to.have.status(204);
+  });
+
+  it("should return a validation error if todo item does not exists and if id is a valid.", async () => {
+    const res = await chai
+      .request(expressApp)
+      .delete("/todos/60d2fe74bd99a211407165e9");
+
+    expect(res).to.have.status(400);
+    expect(res.body)
+      .to.have.nested.property("failures[0].message")
+      .to.equal(
+        "The item with the specified ID could not be found. Please enter a valid ID."
       );
+  });
 
-      const updatedItem = "Item Updated";
+  it("should return a validation error if id is not a valid ID.", async () => {
+    const res = await chai.request(expressApp).delete("/todos/2114071");
 
-      const res = await chai
-        .request(expressApp)
-        .put(`/todos/${todoItem._id}`)
-        .send({
-          title: updatedItem,
-        });
+    expect(res).to.have.status(400);
+    expect(res.body)
+      .to.have.nested.property("failures[0].message")
+      .to.equal(
+        "The specified todo ID is not a valid one. Please provide a valid one."
+      );
+  });
+});
 
-      todoItems.find({ title: updatedItem }, function (err, data) {
-        expect(new TodoItem(data[0]).serialize().title).to.deep.equal(
-          updatedItem
-        );
+describe("PUT /todos/:id", () => {
+  it("should update a todo item if it exists, if id is valid mongo id and if title is valid non-empty string", async () => {
+    const todoItem = await testAppContext.todoItemRepository.save(
+      new TodoItem({ title: "Update TODO" })
+    );
+
+    const updatedItem = "Item Updated";
+
+    const res = await chai
+      .request(expressApp)
+      .put(`/todos/${todoItem._id}`)
+      .send({
+        title: updatedItem,
       });
 
-      expect(res).to.have.status(200);
-      expect(res.body).to.have.property("id");
-      expect(res.body).to.have.property("title");
-      expect(res.body.id).to.deep.equal(todoItem._id.toString());
-      expect(res.body.title).to.deep.equal(updatedItem);
-    });
-
-    it("should return a validation error if empty title is specified", async () => {
-      const todoitem = await testAppContext.todoItemRepository.save(
-        new TodoItem({ title: "TODO_TO_BE_UPDATED" })
+    todoItems.find({ title: updatedItem }, function (err, data) {
+      expect(new TodoItem(data[0]).serialize().title).to.deep.equal(
+        updatedItem
       );
-
-      const res = await chai
-        .request(expressApp)
-        .put(`/todos/${todoitem._id}`)
-        .send({
-          title: "",
-        });
-
-      expect(res).to.have.status(400);
-      expect(res.body)
-        .to.have.nested.property("failures[0].message")
-        .to.equal("The title is empty or the title is not a string.");
     });
 
-    it("should return a validation error if id is invalid mongo id", async () => {
-      const res = await chai.request(expressApp).put("/todos/hhd8882nn").send({
-        title: "Update TODO",
+    expect(res).to.have.status(200);
+    expect(res.body).to.have.property("id");
+    expect(res.body).to.have.property("title");
+    expect(res.body.id).to.deep.equal(todoItem._id.toString());
+    expect(res.body.title).to.deep.equal(updatedItem);
+  });
+
+  it("should return a validation error if empty title is specified", async () => {
+    const todoitem = await testAppContext.todoItemRepository.save(
+      new TodoItem({ title: "TODO_TO_BE_UPDATED" })
+    );
+
+    const res = await chai
+      .request(expressApp)
+      .put(`/todos/${todoitem._id}`)
+      .send({
+        title: "",
       });
 
-      expect(res).to.have.status(400);
-      expect(res.body)
-        .to.have.nested.property("failures[0].message")
-        .to.equal(
-          "The item with the specified ID could not be found. Please enter a valid ID."
-        );
+    expect(res).to.have.status(400);
+    expect(res.body)
+      .to.have.nested.property("failures[0].message")
+      .to.equal("The title is empty or the title is not a string.");
+  });
+
+  it("should return a validation error if id is invalid mongo id", async () => {
+    const res = await chai.request(expressApp).put("/todos/hhd8882nn").send({
+      title: "Update TODO",
     });
 
-    it("should return a 404 if todo item does not exists", async () => {
-      const res = await chai
-        .request(expressApp)
-        .put("/todos/605bb3efc93d78b7f4335c2c")
-        .send({
-          title: "TODO_UPDATED",
-        });
+    expect(res).to.have.status(400);
+    expect(res.body)
+      .to.have.nested.property("failures[0].message")
+      .to.equal(
+        "The item with the specified ID could not be found. Please enter a valid ID."
+      );
+  });
 
-      expect(res).to.have.status(404);
-    });
+  it("should return a 404 if todo item does not exists", async () => {
+    const res = await chai
+      .request(expressApp)
+      .put("/todos/605bb3efc93d78b7f4335c2c")
+      .send({
+        title: "TODO_UPDATED",
+      });
+
+    expect(res).to.have.status(404);
   });
 });
