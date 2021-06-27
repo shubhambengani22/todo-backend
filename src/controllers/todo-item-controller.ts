@@ -1,7 +1,7 @@
 import { BaseController } from "./base-controller";
 import { NextFunction, Response, Router } from "express";
 import { Validation } from "@helpers";
-import { TodoItem } from "@models";
+import { TodoItem, TodoItems } from "@models";
 import {
   AppContext,
   Errors,
@@ -48,6 +48,8 @@ export class TodoItemController extends BaseController {
       fetchTodoItemValidator(this.appContext),
       this.fetchTodoItem
     );
+
+    this.router.get(`${this.basePath}`, this.listTodoItem);
   }
 
   private createTodoItem = async (
@@ -154,5 +156,27 @@ export class TodoItemController extends BaseController {
       );
       next(valError);
     }
+  };
+
+  private listTodoItem = async (
+    req: ExtendedRequest,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const failures: ValidationFailure[] =
+      Validation.extractValidationErrors(req);
+    if (failures.length > 0) {
+      const valError = new Errors.ValidationError(
+        res.__("DEFAULT_ERRORS.VALIDATION_FAILED"),
+        failures
+      );
+      return next(valError);
+    }
+
+    const todoItems = new TodoItems(
+      await this.appContext.todoItemRepository.getAll({})
+    );
+
+    res.status(200).json(todoItems.serialize());
   };
 }

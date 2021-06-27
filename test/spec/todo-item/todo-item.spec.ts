@@ -112,7 +112,9 @@ describe("GET /todos/:id", () => {
     expect(res).to.have.status(400);
     expect(res.body)
       .to.have.nested.property("failures[0].message")
-      .to.equal("The specified ID is not a MongoDB ID.");
+      .to.equal(
+        "The specified todo ID is not a valid one. Please provide a valid one."
+      );
   });
 
   it("should return a 404 if todo item does not exists", async () => {
@@ -224,7 +226,7 @@ describe("PUT /todos/:id", () => {
     expect(res.body)
       .to.have.nested.property("failures[0].message")
       .to.equal(
-        "The item with the specified ID could not be found. Please enter a valid ID."
+        "The specified todo ID is not a valid one. Please provide a valid one."
       );
   });
 
@@ -237,5 +239,54 @@ describe("PUT /todos/:id", () => {
       });
 
     expect(res).to.have.status(404);
+  });
+});
+
+describe("GET /todos", () => {
+  it("we should have got all the todo items", async () => {
+    const res = await chai.request(expressApp).get("/todos");
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.be.an("array");
+  });
+  it("we should check if the items are returned in the same order in which they were created", async () => {
+    await chai.request(expressApp).post("/todos").send({
+      title: "Second Title",
+    });
+
+    await chai.request(expressApp).post("/todos").send({
+      title: "Third Title",
+    });
+
+    const getTodoItemFromMongoose = (data: object) => {
+      return new TodoItem(data).serialize();
+    };
+
+    const convertObjectToString = (data: any) => {
+      data.id = data.id.toString();
+      return data;
+    };
+
+    const res = await chai.request(expressApp).get("/todos");
+    expect(res).to.have.status(200);
+    expect(res.body).to.be.an("array");
+
+    todoItems.find({}, function (err, data) {
+      expect(res.body).to.deep.equal(
+        data.map(getTodoItemFromMongoose).map(convertObjectToString)
+      );
+    });
+  });
+
+  it("we should check if the array returned is empty when there are no todo items", async () => {
+    await testAppContext.todoItemRepository.getAll();
+
+    await testAppContext.todoItemRepository.deleteMany({});
+
+    const res = await chai.request(expressApp).get("/todos");
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.be.an("array");
+    expect(res.body).to.deep.equal([]);
   });
 });
